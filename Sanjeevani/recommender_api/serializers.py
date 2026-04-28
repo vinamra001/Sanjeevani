@@ -29,7 +29,8 @@ class DiseaseSerializer(serializers.ModelSerializer):
         model = Disease
         fields = [
             'id', 'name', 'sanskrit_name', 'description', 
-            'dosha_type', 'diet_plan', 'symptoms', 'remedies'
+            'dosha_type', 'diet_plan', 'foods_to_take', 'foods_to_avoid',
+            'lifestyle_routine', 'recommended_exercises', 'symptoms', 'remedies'
         ]
 
 class UserHealthLogSerializer(serializers.ModelSerializer):

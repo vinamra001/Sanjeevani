@@ -1,33 +1,92 @@
 import React, { useState } from 'react';
 import {
-    View,
-    Text,
-    TextInput,
-    StyleSheet,
-    Alert,
-    TouchableOpacity,
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView
+    View, Text, TextInput, StyleSheet, Alert,
+    TouchableOpacity, ActivityIndicator,
+    KeyboardAvoidingView, Platform, ScrollView
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Add this
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
 
-const API_URL = 'http://10.0.2.2:8000/api/v1/login/';
+import { API_BASE_URL } from '../../constants';
+
+const API_URL = `${API_BASE_URL}/login/`;
+
+// Validation
+const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,30}$/;
+
+const validators = {
+    username: (v) => {
+        if (!v.trim()) return 'Username is required.';
+        if (!USERNAME_REGEX.test(v.trim()))
+            return 'Invalid username format';
+        return null;
+    },
+    password: (v) => {
+        if (!v) return 'Password is required.';
+        if (v.length < 6) return 'Minimum 6 characters required';
+        return null;
+    },
+};
+
+const Field = ({
+    label, value, onChangeText, onBlur,
+    placeholder, secureTextEntry, errorKey,
+    rightElement, errors
+}) => (
+    <View style={styles.fieldWrapper}>
+        <Text style={styles.inputLabel}>{label}</Text>
+
+        <View style={[
+            styles.inputRow,
+            errors[errorKey] && styles.inputError
+        ]}>
+            <TextInput
+                style={styles.inputInner}
+                placeholder={placeholder}
+                value={value}
+                onChangeText={onChangeText}
+                onBlur={onBlur}
+                secureTextEntry={secureTextEntry}
+                autoCapitalize="none"
+                placeholderTextColor="#999"
+            />
+            {rightElement}
+        </View>
+
+        {errors[errorKey] &&
+            <Text style={styles.errorText}>{errors[errorKey]}</Text>
+        }
+    </View>
+);
 
 const LoginScreen = ({ navigation }) => {
-    const [username, setUsername] = useState(''); // Changed from email to username
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = async () => {
-        const cleanUsername = username.trim();
-        const cleanPassword = password.trim();
+    const [errors, setErrors] = useState({
+        username: null,
+        password: null,
+    });
 
-        if (!cleanUsername || !cleanPassword) {
-            Alert.alert("Error", "Please enter both username and password.");
-            return;
-        }
+    const validateField = (field, value) => {
+        const error = validators[field](value);
+        setErrors(prev => ({ ...prev, [field]: error }));
+        return error;
+    };
+
+    const validateAll = () => {
+        const newErrors = {
+            username: validators.username(username),
+            password: validators.password(password.trim()),
+        };
+        setErrors(newErrors);
+        return Object.values(newErrors).every(e => e === null);
+    };
+
+    const handleLogin = async () => {
+        if (!validateAll()) return;
 
         setIsLoading(true);
         try {
@@ -35,97 +94,117 @@ const LoginScreen = ({ navigation }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
                 body: JSON.stringify({
-                    username: cleanUsername,
-                    password: cleanPassword
+                    username: username.trim(),
+                    password: password.trim(),
                 }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                console.log("Login Success! Token:", data.token);
-
-                // --- PERSISTENCE LOGIC ---
-                // Save the token and username locally on the phone
                 await AsyncStorage.setItem('userToken', data.token);
-                await AsyncStorage.setItem('userName', cleanUsername);
-
-                // Navigate to the next screen (Home or Main)
-                navigation.replace('Home');
+                await AsyncStorage.setItem('userName', username.trim());
+                navigation.replace('Home'); // Navigate to Home after login
             } else {
-                Alert.alert("Login Failed", data.error || "Invalid username or password.");
+                Alert.alert('Login Failed', data.error || 'Invalid credentials');
             }
         } catch (error) {
-            console.error("Network Error:", error);
-            Alert.alert(
-                "Connection Error",
-                "Cannot reach the server. Make sure Django is running."
-            );
+            Alert.alert('Error', 'Server not reachable');
         } finally {
             setIsLoading(false);
         }
     };
 
+    const Eye = ({ visible, onPress }) => (
+        <TouchableOpacity onPress={onPress} style={{ paddingLeft: 8 }}>
+            <Feather name={visible ? 'eye' : 'eye-off'} size={20} />
+        </TouchableOpacity>
+    );
+
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={{ flex: 1 }}
         >
             <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.headerSection}>
+
+                {/* Header */}
+                <View style={styles.header}>
                     <Text style={styles.title}>SANJEEVANI</Text>
                     <Text style={styles.subtitle}>Smart Health Assistant</Text>
                 </View>
 
-                <View style={styles.formSection}>
+                {/* Form */}
+                <View style={styles.form}>
                     <Text style={styles.welcomeText}>Welcome Back</Text>
 
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.inputLabel}>Username</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your username"
-                            value={username}
-                            onChangeText={setUsername}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            placeholderTextColor="#999"
-                        />
+                    <Field
+                        label="Username"
+                        value={username}
+                        placeholder="Enter username"
+                        errorKey="username"
+                        errors={errors}
+                        onChangeText={(v) => {
+                            setUsername(v);
+                            if (errors.username) validateField('username', v);
+                        }}
+                        onBlur={() => validateField('username', username)}
+                    />
 
-                        <Text style={styles.inputLabel}>Password</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter password"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                            placeholderTextColor="#999"
-                        />
-                    </View>
+                    <Field
+                        label="Password"
+                        value={password}
+                        placeholder="Enter password"
+                        errors={errors} 
+                        secureTextEntry={!showPassword}
+                        errorKey="password"
+                        onChangeText={(v) => {
+                            setPassword(v);
+                            if (errors.password) validateField('password', v);
+                        }}
+                        onBlur={() => validateField('password', password)}
+                        rightElement={
+                            <Eye
+                                visible={showPassword}
+                                onPress={() => setShowPassword(!showPassword)}
+                            />
+                        }
+                    />
 
+                    {/* Forgot Password Navigation */}
                     <TouchableOpacity
-                        style={[styles.loginButton, isLoading && styles.disabledButton]}
+                        onPress={() => navigation.navigate('ForgotPassword')}
+                        style={styles.forgotLink}
+                    >
+                        <Text style={styles.forgotText}>Forgot Password?</Text>
+                    </TouchableOpacity>
+
+                    {/* Login Button */}
+                    <TouchableOpacity
+                        style={[styles.button, isLoading && styles.disabled]}
                         onPress={handleLogin}
                         disabled={isLoading}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.buttonText}>Login</Text>
-                        )}
+                        {isLoading
+                            ? <ActivityIndicator color="#fff" />
+                            : <Text style={styles.buttonText}>Login</Text>
+                        }
                     </TouchableOpacity>
 
+                    {/* Register Navigation */}
                     <TouchableOpacity
                         onPress={() => navigation.navigate('Register')}
                         style={styles.footerLink}
                     >
                         <Text style={styles.linkText}>
-                            Don't have an account? <Text style={styles.boldGreen}>Register</Text>
+                            Don’t have an account?{' '}
+                            <Text style={styles.boldGreen}>Register</Text>
                         </Text>
                     </TouchableOpacity>
+
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -133,21 +212,121 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flexGrow: 1, backgroundColor: '#fff', padding: 30 },
-    headerSection: { marginTop: 60, marginBottom: 40, alignItems: 'center' },
-    title: { fontSize: 36, fontWeight: '900', color: '#2E7D32', letterSpacing: 3 },
-    subtitle: { fontSize: 14, color: '#666', fontWeight: '500', letterSpacing: 1 },
-    formSection: { flex: 1 },
-    welcomeText: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 30 },
-    inputContainer: { marginBottom: 25 },
-    inputLabel: { fontSize: 14, fontWeight: '600', color: '#555', marginBottom: 8, marginLeft: 4 },
-    input: { height: 55, borderColor: '#f0f0f0', borderWidth: 2, borderRadius: 14, marginBottom: 20, paddingHorizontal: 15, backgroundColor: '#fafafa', fontSize: 16, color: '#000' },
-    loginButton: { backgroundColor: '#2E7D32', height: 55, borderRadius: 14, justifyContent: 'center', alignItems: 'center', elevation: 3 },
-    disabledButton: { backgroundColor: '#A5D6A7' },
-    buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-    footerLink: { marginTop: 30 },
-    linkText: { textAlign: 'center', fontSize: 15, color: '#666' },
-    boldGreen: { color: '#2E7D32', fontWeight: 'bold' }
+    container: {
+        flexGrow: 1,
+        paddingHorizontal: 16,
+        paddingTop: 60,
+        paddingBottom: 20,
+        backgroundColor: '#fff',
+    },
+
+    header: {
+        alignItems: 'center',
+        marginBottom: 40,
+    },
+
+    title: {
+        fontSize: 32,
+        fontWeight: '900',
+        color: '#216c25',
+        letterSpacing: 2,
+    },
+
+    subtitle: {
+        fontSize: 14,
+        color: '#666',
+        marginTop: 5,
+    },
+
+    form: {
+        flex: 1,
+    },
+
+    welcomeText: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: 25,
+    },
+
+    fieldWrapper: {
+        marginBottom: 14,
+    },
+
+    inputLabel: {
+        fontSize: 13,
+        marginBottom: 6,
+        color: '#444',
+    },
+
+    inputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        height: 50,
+        backgroundColor: '#fafafa',
+    },
+
+    inputInner: {
+        flex: 1,
+        fontSize: 15,
+    },
+
+    inputError: {
+        borderColor: '#e53935',
+    },
+
+    errorText: {
+        color: '#e53935',
+        fontSize: 12,
+    },
+
+    forgotLink: {
+        alignSelf: 'flex-end',
+        marginBottom: 15,
+    },
+
+    forgotText: {
+        fontSize: 13,
+        color: '#216c25',
+        fontWeight: '600',
+    },
+
+    button: {
+        backgroundColor: '#216c25',
+        height: 52,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    disabled: {
+        backgroundColor: '#a5d6a7',
+    },
+
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+
+    footerLink: {
+        marginTop: 20,
+    },
+
+    linkText: {
+        textAlign: 'center',
+        fontSize: 14,
+        color: '#666',
+    },
+
+    boldGreen: {
+        color: '#216c25',
+        fontWeight: '700',
+    },
 });
 
 export default LoginScreen;

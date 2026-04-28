@@ -1,47 +1,72 @@
+import sqlite3
+import pandas as pd
+import json
 import os
-import django
 
-# Setup Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AyurRecSys.settings')
-django.setup()
+def import_ayurveda_data():
+    db_name = 'db.sqlite3'
+    
+    # 1. Connect and Clear Existing Data
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    
+    tables = [
+        "recommender_api_disease", 
+        "recommender_api_remedy", 
+        "recommender_api_symptom",
+        "recommender_api_disease_symptoms",
+        "recommender_api_disease_remedies"
+    ]
+    
+    print("🧹 Clearing existing data...")
+    for table in tables:
+        cursor.execute(f"DROP TABLE IF EXISTS {table}")
+    
+    # 2. Import CSV Files (Disease, Remedy, Disease_Remedies)
+    print("csv Importing CSV files...")
+    csv_files = {
+        "recommender_api_disease": "recommender_api_disease.csv",
+        "recommender_api_remedy": "recommender_api_remedy.csv",
+        "recommender_api_disease_remedies": "recommender_api_disease_remedies.csv"
+    }
+    
+    for table, file in csv_files.items():
+        if os.path.exists(file):
+            df = pd.read_csv(file)
+            df.to_sql(table, conn, if_exists='replace', index=False)
+            print(f"✅ Imported {len(df)} rows into {table}")
 
-from django.apps import apps
+    # 3. Import JSON Files (Symptoms and Mappings)
+    json_files = {
+        "recommender_api_symptom": "recommender_api_symptom.json",
+        "recommender_api_disease_symptoms": "recommender_api_disease_symptoms.json"
+    }
 
-def check_data():
-    try:
-        # 1. Try to find the Disease model in 'api' app
-        # If your app is named differently, change 'api' below
-        Disease = apps.get_model('api', 'Disease')
-        count = Disease.objects.count()
-        
-        print("\n" + "="*40)
-        print(f"🌿 SANJEEVANI DATABASE STATUS 🌿")
-        print("="*40)
-        print(f"Total Diseases in Database: {count}")
-        
-        if count > 0:
-            d = Disease.objects.first()
-            print(f"\n✅ SUCCESS: Found data for '{d.name}'")
+    for table, file in json_files.items():
+        if os.path.exists(file):
+            with open(file, 'r') as f:
+                data = json.load(f)
             
-            # Show all fields so we find the remedy data
-            fields = [f.name for f in d._meta.get_fields()]
-            print(f"Available Data Fields: {fields}")
+            # Flatten the 'name' array into a string for SQLite compatibility
+            flattened_data = []
+            for entry in data:
+                new_entry = entry.copy()
+                if 'name' in new_entry and isinstance(new_entry['name'], list):
+                    new_entry['name'] = ", ".join(new_entry['name'])
+                flattened_data.append(new_entry)
             
-            # Let's try to print the actual remedy content
-            for possible in ['remedy', 'treatment', 'chikitsa', 'description']:
-                if hasattr(d, possible):
-                    content = getattr(d, possible)
-                    print(f"\n--- {possible.upper()} CONTENT ---")
-                    print(content[:200] + "..." if content else "Field is Empty")
-        else:
-            print("\n🚨 WARNING: Tables exist, but they are EMPTY.")
-            print("You need to upload your Ayurvedic data.")
-            
-    except LookupError:
-        print("\n❌ ERROR: Could not find the 'Disease' model.")
-        print("Please check if 'api' is the correct app name in settings.py")
-    except Exception as e:
-        print(f"\n❌ ERROR: {str(e)}")
+            df_json = pd.DataFrame(flattened_data)
+            df_json.to_sql(table, conn, if_exists='replace', index=False)
+            print(f"✅ Imported {len(df_json)} rows into {table}")
+
+    # 4. Create Performance Indexes
+    print("🚀 Optimizing database with indexes...")
+    cursor.execute("CREATE INDEX idx_disease_id ON recommender_api_disease_symptoms(disease_id)")
+    cursor.execute("CREATE INDEX idx_symptom_id ON recommender_api_disease_symptoms(symptom_id)")
+    
+    conn.commit()
+    conn.close()
+    print("🎉 All 2.5 Lakh records imported successfully!")
 
 if __name__ == "__main__":
-    check_data()
+    import_ayurveda_data()

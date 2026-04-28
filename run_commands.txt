@@ -1,0 +1,36 @@
+# Sanjeevani App - Run Commands
+
+To fully test the Sanjeevani App on your mobile device, you need to run both the Backend (Django) and Frontend (Expo React Native) servers simultaneously.
+
+Please open TWO separate terminals or command prompts and follow these instructions:
+
+## 1. Start the Backend Server (Terminal 1)
+Open a terminal, navigate to the `Sanjeevani` folder and activate the virtual environment before starting the server.
+
+```powershell
+cd "c:\Users\Neha Kachkure\Downloads\Sanjeevani-App\Sanjeevani"
+
+# Activate the virtual environment
+.\venv\Scripts\activate
+
+# Run the Django server on your local IP so your phone can reach it
+python manage.py runserver 0.0.0.0:8000
+```
+*(Leave this terminal window open and running)*
+
+
+## 2. Start the Frontend Server (Terminal 2)
+Open a new terminal and navigate to the `Sanjeevani_Frontend` folder.
+
+```powershell
+cd "c:\Users\Neha Kachkure\Downloads\Sanjeevani-App\Sanjeevani_Frontend"
+
+# Clear the cache and start the Metro Bundler
+npx expo start -c
+```
+*(Leave this terminal window open and running)*
+
+## 3. Test on Mobile
+- Open the **Expo Go** app on your phone.
+- Scan the QR code that appears in Terminal 2.
+- The app should load natively and flawlessly execute all the amazing AI endpoints provided by Terminal 1!

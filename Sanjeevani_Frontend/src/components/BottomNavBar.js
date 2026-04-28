@@ -31,11 +31,7 @@ const BottomNavBar = ({ navigation, activeScreen }) => {
         icon="👥"
         label="Family"
         active={activeScreen === 'Family'}
-        onPress={async () => {
-          // Sets Guest Mode so your primary profile data isn't overwritten!
-          await AsyncStorage.setItem('isGuest', 'true');
-          navigation.navigate('Input');
-        }}
+        onPress={() => navigation.navigate('FamilyProfiles')}
       />
       <NavItem
         icon="💬"

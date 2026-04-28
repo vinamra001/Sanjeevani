@@ -43,6 +43,10 @@ class Disease(models.Model):
         choices=[('Vata', 'Vata'), ('Pitta', 'Pitta'), ('Kapha', 'Kapha'), ('Tridoshic', 'Tridoshic')]
     )
     diet_plan = models.TextField(help_text="Recommended Ayurvedic diet for this condition.")
+    foods_to_take = models.TextField(blank=True, help_text="Specific foods to take")
+    foods_to_avoid = models.TextField(blank=True, help_text="Specific foods to avoid")
+    lifestyle_routine = models.TextField(blank=True, help_text="Lifestyle instructions")
+    recommended_exercises = models.TextField(blank=True, help_text="Yoga and exercises")
     
     # Relationships
     symptoms = models.ManyToManyField(Symptom, related_name='diseases')
@@ -50,6 +54,18 @@ class Disease(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SymptomDiseaseMapping(models.Model):
+    """
+    Houses the 2.5 Lakh exact symptom combination mappings explicitly.
+    db_index=True ensures rapid retrieval across high volume records.
+    """
+    symptoms_combo_key = models.CharField(max_length=500, unique=True, db_index=True)
+    disease_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.symptoms_combo_key} -> {self.disease_name}"
 
 
 # --- 2. USER HEALTH TRACKING MODELS ---

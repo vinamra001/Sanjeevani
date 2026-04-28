@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
-    SymptomListView, 
-    PredictionView, 
+    SymptomListView,
+    PredictionView,
     DiseaseDetailView,
     LoginView,
     RegisterView,
@@ -9,7 +9,21 @@ from .views import (
     UpdatePrakritiView,
     GetProfileView,
     GetAyurvedicPlanView,
-    AdminStatsView
+    AdminStatsView,
+    ForgotPasswordView,
+    BlogListView,
+    HealthHistoryView,
+    VoiceSymptomView,
+    FamilyMembersView, 
+    FamilyMembersSyncView,
+    MealPlanView,
+    IdentifyHerbView,
+    HealthScoreView,
+    ForumPostsView, 
+    ForumUpvoteView,
+    OfflineChatSyncView,
+    SeasonalGuideView,
+    VedicAstroView
 )
 
 urlpatterns = [
@@ -44,4 +58,34 @@ urlpatterns = [
     path('get-plan/', GetAyurvedicPlanView.as_view(), name='get-plan'),
 
     path('admin-stats/', AdminStatsView.as_view(), name='admin-stats'),
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+    path('blogs/', BlogListView.as_view(), name='blogs'),
+    path('health-history/', HealthHistoryView.as_view(), name='health-history'),
+    path('voice-symptom/', VoiceSymptomView.as_view(), name='voice-symptom'),
+    
+    # Family profiles
+    path('family-members/',       FamilyMembersView.as_view(),      name='family-members'),
+    path('family-members/sync/',  FamilyMembersSyncView.as_view(),  name='family-sync'),
+
+    # AI Meal Planner
+    path('meal-plan/',            MealPlanView.as_view(),           name='meal-plan'),
+
+    # AR Herb Identifier
+    path('identify-herb/',        IdentifyHerbView.as_view(),       name='identify-herb'),
+
+    # Health Score
+    path('health-score/',         HealthScoreView.as_view(),        name='health-score'),
+
+    # Community Forum
+    path('forum/posts/',          ForumPostsView.as_view(),         name='forum-posts'),
+    path('forum/upvote/',         ForumUpvoteView.as_view(),        name='forum-upvote'),
+
+    # Offline Chat
+    path('offline-chat-sync/',    OfflineChatSyncView.as_view(),    name='offline-chat-sync'),
+
+    # Seasonal Guide
+    path('seasonal-guide/',       SeasonalGuideView.as_view(),      name='seasonal-guide'),
+
+    # Vedic Astro + Ayurveda
+    path('vedic-astro/',          VedicAstroView.as_view(),         name='vedic-astro'),
 ]

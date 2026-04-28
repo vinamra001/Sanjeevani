@@ -61,6 +61,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'AyurRecSys.wsgi.application'
 
 # 5. DATABASE (MongoDB via Djongo)
+# 5. DATABASE (MongoDB + SQLite)
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
@@ -69,12 +70,16 @@ DATABASES = {
         'CLIENT': {
             'host': 'mongodb://localhost:27017/',
         }
+    },
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
 # 6. AI CONFIGURATION (Gemini)
 # We will use the hardcoded key for now to ensure the chatbot is "Online"
-GEMINI_API_KEY = 'AIzaSyCBmm5Qtx1CC5DnhE0s3bx4Kp3soAuuUwg'
+GEMINI_API_KEY = 'AIzaSyC-yP39OYwUI7JkSrIeO5A0CeSKkruvNxw'
 
 # 7. OTHER DEFAULTS
 AUTH_PASSWORD_VALIDATORS = [
@@ -84,9 +89,19 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+
+# 8. EMAIL CONFIGURATION
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'nehakachkure04@gmail.com'
+EMAIL_HOST_PASSWORD = 'vivf xigi ugsk jovd'
+DEFAULT_FROM_EMAIL = 'Sanjeevani <nehakachkure04@gmail.com>'
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-STATIC_URL = 'static/'
+STATIC_URL = 'static/'  
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
