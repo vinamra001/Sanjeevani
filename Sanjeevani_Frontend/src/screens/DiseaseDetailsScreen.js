@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-
-const API_BASE_URL = 'http://192.168.0.106:8000/api/v1';
+import { API_BASE_URL } from '../constants';
 
 // ─── Refined Green Palette (matches HomeScreen) ───────────────────────────────
 const THEME_COLOR    = '#2D7D46';

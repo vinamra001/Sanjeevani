@@ -6,9 +6,9 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../constants';
 
 const { width } = Dimensions.get('window');
-const API_BASE_URL  = 'http://192.168.0.106:8000/api/v1';
 const THEME_COLOR   = '#2D7D46';
 const THEME_DARK    = '#1E5C33';
 const THEME_SURFACE = '#EAF4EC';

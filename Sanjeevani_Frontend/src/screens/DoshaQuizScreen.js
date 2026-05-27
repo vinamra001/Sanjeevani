@@ -14,6 +14,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNavBar from "../components/BottomNavBar";
+import { API_BASE_URL } from '../constants';
 
 const { width } = Dimensions.get("window");
 
@@ -267,7 +268,7 @@ const DoshaQuizScreen = ({ navigation }) => {
       if (!isGuestMode) {
         try {
           await axios.post(
-            "http://192.168.0.106:8000/api/v1/update-prakriti/",
+            `${API_BASE_URL}/update-prakriti/`,
             { username, prakriti: finalResult },
             { timeout: 4000 },
           );

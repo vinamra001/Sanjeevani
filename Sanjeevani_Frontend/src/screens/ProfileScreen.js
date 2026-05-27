@@ -10,6 +10,7 @@ import * as Sharing from 'expo-sharing';
 import { translations } from '../utils/translations';
 import BottomNavBar from '../components/BottomNavBar';
 import { getHistoryByUsername } from '../utils/DatabaseInit';
+import { API_BASE_URL } from '../constants';
 
 const { width } = Dimensions.get('window');
 
@@ -20,8 +21,6 @@ const THEME_SURFACE  = '#EAF4EC';
 const BACKGROUND     = '#F7FAF8';
 const TEXT_PRIMARY   = '#141F17';
 const TEXT_SECONDARY = '#5A6E60';
-
-const API_BASE_URL = 'http://192.168.0.106:8000/api/v1';
 
 // ALL keys written by any screen in the app that store profile data
 const PROFILE_KEYS = ['userName', 'userEmail', 'userAge', 'userGender', 'userDosha', 'userPrakriti'];

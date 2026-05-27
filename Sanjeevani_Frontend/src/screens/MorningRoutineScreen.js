@@ -9,6 +9,7 @@ import axios from 'axios';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { translations } from '../utils/translations';
 import BottomNavBar from '../components/BottomNavBar';
+import { API_BASE_URL } from '../constants';
 
 const { width } = Dimensions.get('window');
 
@@ -161,7 +162,7 @@ const MorningRoutineScreen = ({ navigation }) => {
         let prakriti = offlinePrakriti || 'General';
         try {
           const response = await axios.get(
-            `http://192.168.0.106:8000/api/v1/get-profile/?username=${username}`,
+            `${API_BASE_URL}/get-profile/?username=${username}`,
             { timeout: 5000 }
           );
           prakriti = response.data.prakriti || offlinePrakriti || 'General';

@@ -10,6 +10,7 @@ import { getAllBlogs, addLocalBlog } from '../utils/DatabaseInit';
 import { TextInput } from 'react-native';
 import { initDatabase } from '../utils/DatabaseInit';
 import { Alert } from 'react-native';
+import { API_BASE_URL } from '../constants';
 
 const { width } = Dimensions.get('window');
 
@@ -23,7 +24,7 @@ const TEXT_PRIMARY   = '#141F17';
 const TEXT_SECONDARY = '#5A6E60';
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API_URL = 'http://192.168.0.106:8000/api/v1/blogs/';
+const API_URL = `${API_BASE_URL}/blogs/`;
 
 // ── Category tag color map (backend returns category string)
 const CATEGORY_COLORS = {

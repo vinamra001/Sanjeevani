@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { API_BASE_URL } from '../constants';
 
-const API_BASE_URL = 'http://192.168.0.106:8000/api/v1';
 
 const SeasonalRituScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);

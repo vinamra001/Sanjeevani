@@ -1,13 +1,16 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 1. BASE PATHS
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 2. SECURITY
-SECRET_KEY = 'django-insecure-^54&77&**gvh6a-1qv)x_6pyb88$j36=ss)xxisjo-0am@d479'
-DEBUG = True
-ALLOWED_HOSTS = ['10.0.2.2', 'localhost', '127.0.0.1', '*']
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-^54&77&**gvh6a-1qv)x_6pyb88$j36=ss)xxisjo-0am@d479')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 # 3. APP DEFINITION
 INSTALLED_APPS = [
@@ -65,10 +68,10 @@ WSGI_APPLICATION = 'AyurRecSys.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'ayur_online_db',
+        'NAME': os.getenv('MONGO_DB_NAME', 'ayur_online_db'),
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb://localhost:27017/',
+            'host': os.getenv('DATABASE_URL', 'mongodb://localhost:27017/'),
         }
     },
     'sqlite': {
@@ -78,8 +81,7 @@ DATABASES = {
 }
 
 # 6. AI CONFIGURATION (Gemini)
-# We will use the hardcoded key for now to ensure the chatbot is "Online"
-GEMINI_API_KEY = 'AIzaSyC-yP39OYwUI7JkSrIeO5A0CeSKkruvNxw'
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 
 # 7. OTHER DEFAULTS
 AUTH_PASSWORD_VALIDATORS = [
@@ -95,9 +97,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'nehakachkure04@gmail.com'
-EMAIL_HOST_PASSWORD = 'vivf xigi ugsk jovd'
-DEFAULT_FROM_EMAIL = 'Sanjeevani <nehakachkure04@gmail.com>'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'nehakachkure04@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Sanjeevani <nehakachkure04@gmail.com>')
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'

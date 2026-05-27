@@ -11,3 +11,7 @@ Sanjeevani/db.sqlite3
 Sanjeevani/__pycache__/
 .DS_Store
 node_modules
+.env
+.venv/
+Sanjeevani/.venv/
+Sanjeevani_Frontend/.idea/

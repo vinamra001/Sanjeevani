@@ -8,9 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import { translations } from '../utils/translations';
+import { API_BASE_URL } from '../constants';
 
 const { width } = Dimensions.get('window');
-const API_BASE_URL   = 'http://192.168.0.106:8000/api/v1';
 const THEME_COLOR    = '#2D7D46';
 const THEME_DARK     = '#1E5C33';
 const THEME_LIGHT    = '#4CAF72';

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, StatusBar } from 'react-native';
 import axios from 'axios';
+import { API_BASE_URL } from '../constants';
 
 // ─── Refined Green Palette (matches HomeScreen) ───────────────────────────────
 const THEME_COLOR    = '#2D7D46';
@@ -23,7 +24,7 @@ const AdminDashboardScreen = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('http://192.168.0.106:8000/api/v1/admin-stats/');
+      const response = await axios.get(`${API_BASE_URL}/admin-stats/`);
       setStats(response.data);
     } catch (e) {
       console.error("Admin Stats Fetch Error:", e);

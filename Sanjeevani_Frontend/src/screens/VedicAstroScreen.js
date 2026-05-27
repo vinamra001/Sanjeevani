@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { API_BASE_URL } from '../constants';
 
-const API_BASE_URL = 'http://192.168.0.106:8000/api/v1';
 const THEME_COLOR = '#4B0082'; // Indigo for Astrology
 
 const VedicAstroScreen = ({ route, navigation }) => {

@@ -8,6 +8,7 @@ import axios from 'axios';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLanguage } from '../context/LanguageContext';
 import BottomNavBar from '../components/BottomNavBar';
+import { API_BASE_URL } from '../constants';
 
 
 const { width } = Dimensions.get('window');
@@ -54,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
         setDisplayName(name);
         try {
           const response = await axios.get(
-            `http://192.168.0.106:8000/api/v1/get-profile/?username=${name}`,
+            `${API_BASE_URL}/get-profile/?username=${name}`,
             { timeout: 8000 }
           );
           if (response.data.prakriti && response.data.prakriti !== 'Not Analyzed') {
